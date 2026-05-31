@@ -7,27 +7,22 @@ Study Planning Engine with:
 - Chat-based recalibration
 """
 
-# Standard Library Imports
+# ── Standard library ──────────────────────────────────────────
 import os, sys, datetime, base64
+from typing import cast
 
-# Fix Python import path
+# ── Fix import path so `agent` package is found ───────────────
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, PROJECT_ROOT)
 
-# Third-Party Imports
+# ── Third-party ───────────────────────────────────────────────
 import streamlit as st
 
-# Internal Project Imports
+# ── Internal ──────────────────────────────────────────────────
 from agent import load_model, generate_plan, chat_reply
-from agent.state import (
-    StudyPlanRequest,
-    TadarrujState,
-    ChatMessage,
-)
+from agent.state import StudyPlanRequest, TadarrujState, ChatMessage
 
-from typing import cast
-
-# Streamlit Page Configuration
+# ── Page config ───────────────────────────────────────────────
 st.set_page_config(
     page_title="تدرج | Tadarruj",
     page_icon="assets/page_icon.svg",
@@ -42,16 +37,18 @@ st.markdown("""
 
         /* ── Color tokens ── */
         :root {
-            --primary:        #1e46c0;
-            --primary-hover:  #1a3aa8;
-            --primary-light:  #5b8cf8;
-            --success:       #bbf7d0;
-            --success-hover: #86efac;
-            --muted:          #64748b;
-            --border:         #dbe4f0;
-            --shadow:         rgba(30, 70, 192, 0.08);
+            --primary:        #1e46c0;   /* main blue */
+            --primary-hover:  #1a3aa8;   /* darker blue for hover */
+            --primary-light:  #5b8cf8;   /* lighter blue accent */
+            --success:        #bbf7d0;   /* green button background */
+            --success-hover:  #86efac;   /* green button hover */
+            --muted:          #64748b;   /* secondary text */
+            --border:         #dbe4f0;   /* card and input borders */
+            --shadow:         rgba(30, 70, 192, 0.08); /* subtle card shadow */
+            --bubble-bot-bg:  #e2e8f0;   /* bot chat bubble background */
         }
-        /* ── Base ── */
+
+        /* ── Base: apply Cairo font and RTL direction ── */
         html, body, [class*="css"], .stMarkdown, h1, h2, h3, p {
             font-family: 'Cairo', sans-serif !important;
         }
@@ -59,12 +56,12 @@ st.markdown("""
             direction: rtl;
         }
         .block-container {
-        padding-top: 2rem;
-        padding-bottom: 10rem !important;
-        max-width: 720px;
+            padding-top: 2rem;
+            padding-bottom: 10rem !important;
+            max-width: 720px;
         }
 
-        /* ── Labels ── */
+        /* ── Form labels ── */
         label,
         .stSelectbox label,
         .stNumberInput label,
@@ -85,7 +82,7 @@ st.markdown("""
             border-radius: 10px !important;
         }
 
-        /* ── Slider: keep LTR so values are correct ── */
+        /* ── Slider: force LTR so min/max values render correctly ── */
         .stSlider {
             direction: ltr;
         }
@@ -99,14 +96,14 @@ st.markdown("""
             margin-bottom: 8px !important;
         }
 
-        /* ── Prevent overflow on small screens ── */
+        /* ── Prevent horizontal overflow on small screens ── */
         .stTextInput, .stSelectbox, .stNumberInput,
         .stDateInput, .stRadio, .stSlider {
             max-width: 100% !important;
             overflow: hidden;
         }
 
-        /* ── Radio ── */
+        /* ── Radio buttons: stack vertically ── */
         .stRadio > div {
             flex-direction: column !important;
             flex-wrap: wrap !important;
@@ -119,7 +116,8 @@ st.markdown("""
             display: block !important;
             margin-bottom: 8px !important;
         }
-        /* ── Expander / form card ── */
+
+        /* ── Expander used as the form card ── */
         section[data-testid="stExpander"] {
             border: 1px solid var(--border) !important;
             border-radius: 16px !important;
@@ -133,14 +131,15 @@ st.markdown("""
             direction: rtl;
         }
 
-        /* ── Caption ── */
+        /* ── Section captions ── */
         div[data-testid="stCaption"] {
             font-size: 1rem !important;
             color: var(--muted) !important;
             direction: rtl;
             text-align: right;
         }
-        /* ── Primary button ── */
+
+        /* ── Primary button (generate plan) ── */
         .stButton button[kind="primary"] {
             background-color: var(--primary) !important;
             border: none !important;
@@ -151,23 +150,25 @@ st.markdown("""
         .stButton button[kind="primary"]:hover {
             background-color: var(--primary-hover) !important;
         }
-        /* ── Secondary button ── */
+
+        /* ── Secondary button (log hours) ── */
         .stButton button[kind="secondary"] {
-        background-color: var(--success) !important;
-        border: none !important;
-        font-size: 1rem !important;
-        font-weight: 700 !important;
-        color: black !important;
+            background-color: var(--success) !important;
+            border: none !important;
+            font-size: 1rem !important;
+            font-weight: 700 !important;
+            color: black !important;
         }
         .stButton button[kind="secondary"]:hover {
-        background-color: var(--success-hover) !important;
-        color: inherit !important;
+            background-color: var(--success-hover) !important;
+            color: inherit !important;
         }
         .stButton button {
             white-space: nowrap !important;
             font-size: clamp(0.75rem, 3vw, 1rem) !important;
         }
-        /* ── Plan box ── */
+
+        /* ── Generated study plan display ── */
         .plan-box {
             border-right: 4px solid var(--primary);
             border-radius: 12px;
@@ -178,92 +179,96 @@ st.markdown("""
             direction: rtl;
             text-align: right;
         }
-        /* ── Chat bubbles ── */
+
+        /* ── User chat bubble (right-aligned, no avatar) ── */
         .bubble-user {
-        background: var(--primary);
-        color: white;
-        border-radius: 16px;
-        padding: 1rem;
-        max-width: 100%;
-        font-size: 1rem;
-        line-height: 1.8;
-        direction: rtl;
-        text-align: right;
-        margin: 8px 0 8px 0;
+            background: var(--primary);
+            color: white;
+            border-radius: 16px;
+            padding: 1rem;
+            max-width: 100%;
+            font-size: 1rem;
+            line-height: 1.8;
+            direction: rtl;
+            text-align: right;
+            margin: 8px 0;
         }
+
+        /* ── Bot chat row: avatar + bubble side by side ── */
         .chat-bot-row {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        margin: 6px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 6px 0;
         }
         .bot-avatar {
-        width: 32px; height: 32px;
-        border-radius: 50%;
-        border: 1px solid var(--border);
-        background: #e2e8f0;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1rem;
-        flex-shrink: 0;
-        margin-top: 2px;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bubble-bot-bg);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
         .bubble-bot {
-        background: #e2e8f0;
-        color: black;
-        border-radius: 16px;
-        padding: 1rem;
-        max-width: 100%;
-        font-size: 1rem;
-        line-height: 1.8;
-        direction: rtl;
-        text-align: right;
-        margin: 8px 0 8px 0;
+            background: var(--bubble-bot-bg);
+            color: black;
+            border-radius: 16px;
+            padding: 1rem;
+            max-width: 100%;
+            font-size: 1rem;
+            line-height: 1.8;
+            direction: rtl;
+            text-align: right;
+            margin: 8px 0;
         }
-        /* ── Metric ── */
+
+        /* ── Progress metrics: center values and labels ── */
         [data-testid="stMetric"] {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
         }
         [data-testid="stMetricValue"] {
-        width: 100% !important;
-        font-size: 1.5rem !important;
-        font-weight: 700 !important;
+            width: 100% !important;
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
         }
         [data-testid="stMetricLabel"] {
-        width: 100% !important;
-        font-size: 1rem !important;
+            width: 100% !important;
+            font-size: 1rem !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# ── Logo + header ─────────────────────────────────────────────
+# ── Logo: load SVG as base64 so it renders inline ─────────────
 with open("assets/page_icon.svg", "rb") as f:
     LOGO_SVG = base64.b64encode(f.read()).decode()
 
 st.markdown(f"""
-    <div style="display: flex; align-items: center; gap: 10px; direction: rtl; margin-bottom: 0.5rem;">
+    <div style="display:flex; align-items:center; gap:10px; direction:rtl; margin-bottom:0.5rem;">
         <img src="data:image/svg+xml;base64,{LOGO_SVG}" width="40">
-        <h3 style="margin: 0;">طريقك الهادئ نحو النجاح</h3>
+        <h3 style="margin:0;">طريقك الهادئ نحو النجاح</h3>
     </div>
 """, unsafe_allow_html=True)
 
 st.write("حوّل موعد اختبارك إلى خطة يومية واضحة وقابلة للتنفيذ، بخطوات منظمة بعيدًا عن الضغط والفوضى لتصل بثقة إلى هدفك.")
 
-# ── Load model ────────────────────────────────────────────────
+# ── Load fine-tuned model (cached across reruns) ──────────────
 @st.cache_resource(show_spinner=":hourglass: جارٍ تحميل النموذج...")
 def get_model():
     return load_model()
 
 get_model()
 
-# ── Session state ─────────────────────────────────────────────
+# ── Session state: initialize defaults on first run ───────────
 for k, v in [("plan", None), ("request", None), ("chat_history", []), ("hours_done", 0.0)]:
     if k not in st.session_state:
         st.session_state[k] = v
 
 # ══════════════════════════════════════════════════════════════
-# FORM
+# FORM — collect exam info and generate plan
 # ══════════════════════════════════════════════════════════════
 with st.expander(":memo: معلومات الاختبار", expanded=(st.session_state.plan is None)):
 
@@ -273,18 +278,20 @@ with st.expander(":memo: معلومات الاختبار", expanded=(st.session_
         "SAT", "STEP", "IELTS",
         "رياضيات", "فيزياء", "كيمياء", "أحياء", "أخرى",
     ])
-    
+
+    # Allow free-text entry when subject is not in the list
     if subject == "أخرى":
         custom_subject = st.text_input("اكتب اسم المادة أو الاختبار")
         if custom_subject.strip():
             subject = custom_subject.strip()
 
+    # cast() resolves the type ambiguity from st.date_input
     exam_date = cast(
         datetime.date,
         st.date_input(
-        "حدد تاريخ الاختبار",
-        value=datetime.date.today() + datetime.timedelta(days=45),
-        min_value=datetime.date.today() + datetime.timedelta(days=1),
+            "حدد تاريخ الاختبار",
+            value=datetime.date.today() + datetime.timedelta(days=45),
+            min_value=datetime.date.today() + datetime.timedelta(days=1),
         )
     )
     days_left = (exam_date - datetime.date.today()).days
@@ -312,12 +319,14 @@ with st.expander(":memo: معلومات الاختبار", expanded=(st.session_
     if took_before:
         current_score = st.number_input("ما درجتك السابقة؟", min_value=1, max_value=1600, value=70, step=1)
 
+    # Block generation if too few days remain
     if days_left < 7:
         st.warning(":warning: الوقت المتبقي قصير جدًا، نوصي بحد أدنى 7 أيام لبناء خطة فعّالة.")
         generate_btn = False
     else:
         generate_btn = st.button(":rocket: أنشئ خطتي الدراسية", type="primary", use_container_width=True)
 
+# ── Generate plan on button click ────────────────────────────
 if generate_btn:
     try:
         req = StudyPlanRequest(
@@ -337,55 +346,55 @@ if generate_btn:
         st.session_state.chat_history = []
         st.session_state.hours_done   = 0.0
         st.success(":white_check_mark: تم إنشاء خطتك الدراسية بنجاح!")
+    
     except Exception as e:
         print(e)
         st.error(":x: حدث خطأ أثناء إنشاء الخطة الدراسية. يرجى المحاولة مرة أخرى.")
 
 # ══════════════════════════════════════════════════════════════
-# PLAN OUTPUT
+# PLAN OUTPUT — shown after plan is generated
 # ══════════════════════════════════════════════════════════════
 if st.session_state.plan:
     req = st.session_state.request
     st.divider()
 
+    # ── Compute progress values ───────────────────────────────
     total_hours_planned = req.hours_per_day * req.days_left
     hours_remaining     = max(0.0, total_hours_planned - st.session_state.hours_done)
     pct = (st.session_state.hours_done / total_hours_planned * 100) if total_hours_planned > 0 else 0
 
-    # Stats
+    # ── Progress metrics ──────────────────────────────────────
     st.caption(":bar_chart: ملخص التقدّم")
     s1, s2, s3 = st.columns(3)
     for col, val, label in [
         (s1, f"{total_hours_planned:.0f}", "إجمالي ساعات الخطة"),
         (s2, f"{st.session_state.hours_done:.1f}", "الساعات المنجزة"),
         (s3, f"{hours_remaining:.1f}", "الساعات المتبقية"),
-        ]:
+    ]:
         with col:
             st.metric(label=label, value=val)
 
-    st.markdown(f"<div style='display:flex; justify-content:space-between; margin-bottom:4px;'>"
-                f"<span style='color:var(--muted); font-size:0.85rem;'>نسبة الإنجاز</span>"
-                f"<span style='color:var(--primary); font-weight:700;'>{pct:.0f}%</span>"
-                f"</div>", 
-        unsafe_allow_html=True
+    # ── Progress bar with percentage label ───────────────────
+    st.markdown(
+        f"<div style='display:flex; justify-content:space-between; margin-bottom:4px;'>"
+        f"<span style='color:var(--muted); font-size:0.85rem;'>نسبة الإنجاز</span>"
+        f"<span style='color:var(--primary); font-weight:700;'>{pct:.0f}%</span>"
+        f"</div>",
+        unsafe_allow_html=True,
     )
     st.progress(min(pct / 100, 1.0))
 
-    # Log hours
+    # ── Log study hours ───────────────────────────────────────
     st.divider()
     logged = st.number_input(
         "كم ساعة درست اليوم؟",
-        min_value=0.0, 
-        max_value=24.0, 
-        step=0.5, 
-        value=0.0, 
-        key="log_input",
+        min_value=0.0, max_value=24.0, step=0.5, value=0.0, key="log_input",
     )
     if st.button(":white_check_mark: إضافة الساعات", use_container_width=True):
         st.session_state.hours_done += logged
         st.rerun()
 
-    # Today's focus
+    # ── Today's focus: extract day-1 lines from the plan ─────
     st.divider()
     st.caption(":dart: تركيز اليوم")
     focus_lines = [
@@ -398,12 +407,12 @@ if st.session_state.plan:
     else:
         st.info(f"ابدأ بـ {req.hours_per_day} ساعة دراسة اليوم وفق خطتك أدناه.")
 
-    # Full plan
+    # ── Full generated plan ───────────────────────────────────
     st.divider()
     st.caption(":open_book: خطتك الدراسية")
     st.markdown(f'<div class="plan-box">{st.session_state.plan}</div>', unsafe_allow_html=True)
 
-    # Recommendation
+    # ── Recommendation based on completion percentage ─────────
     st.divider()
     st.caption(":bulb: التوصية الحالية")
     if pct < 10:
@@ -414,26 +423,27 @@ if st.session_state.plan:
         rec = "أنت في مرحلة متقدمة. ابدأ بزيادة التطبيق وحل الأسئلة."
     else:
         rec = "اقترب موعد الاختبار. ركّز على المحاكاة والمراجعة الخفيفة والراحة الكافية."
-    st.info(f"{rec}")
+    st.info(rec)
 
     # ══════════════════════════════════════════════════════════
-    # CHAT
+    # CHAT — recalibration and Q&A
     # ══════════════════════════════════════════════════════════
     st.divider()
     st.caption(":thought_balloon: اسأل أو عدّل خطتك")
     st.write("يمكنك طلب تعديل الخطة إذا فاتتك أيام، أو تغيّرت ظروفك، أو أردت إضافة مادة جديدة.")
 
+    # ── Render chat history ───────────────────────────────────
     for msg in st.session_state.chat_history:
         if msg.role == "user":
-            st.markdown(f'<div class="bubble-user">{msg.content}</div>',
-                        unsafe_allow_html=True)
+            st.markdown(f'<div class="bubble-user">{msg.content}</div>', unsafe_allow_html=True)
         else:
             st.markdown(f"""
             <div class="chat-bot-row">
-            <div class="bot-avatar">🤖</div>
-            <div class="bubble-bot">{msg.content}</div>
+                <div class="bot-avatar">🤖</div>
+                <div class="bubble-bot">{msg.content}</div>
             </div>""", unsafe_allow_html=True)
 
+    # ── Handle new user message ───────────────────────────────
     user_chat = st.chat_input("اكتب سؤالك أو التعديل المطلوب")
     if user_chat:
         new_history = st.session_state.chat_history + [ChatMessage(role="user", content=user_chat)]
@@ -445,6 +455,7 @@ if st.session_state.plan:
         with st.spinner(":hourglass: جارٍ تحديث خطتك..."):
             updated_state = chat_reply(agent_state)
         st.session_state.chat_history = updated_state.chat_history
+        # Update plan in session if agent returned a revised version
         if updated_state.plan != st.session_state.plan:
             st.session_state.plan = updated_state.plan
         st.rerun()
