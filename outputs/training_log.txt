@@ -1,0 +1,345 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+Loading base model...
+==((====))==  Unsloth 2026.5.8: Fast Qwen2 patching. Transformers: 5.5.0.
+   \\   /|    Tesla T4. Num GPUs = 1. Max memory: 14.562 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.10.0+cu128. CUDA: 7.5. CUDA Toolkit: 12.8. Triton: 3.6.0
+\        /    Bfloat16 = FALSE. FA [Xformers = 0.0.35. FA2 = False]
+ "-____-"     Free license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/339 [00:04<22:43,  4.03s/it]
+Loading weights:  12%|█▏        | 40/339 [00:04<00:26, 11.40it/s]
+Loading weights:  15%|█▌        | 52/339 [00:05<00:21, 13.20it/s]
+Loading weights:  17%|█▋        | 57/339 [00:05<00:18, 14.86it/s]
+Loading weights:  20%|██        | 69/339 [00:05<00:12, 21.03it/s]
+Loading weights:  23%|██▎       | 77/339 [00:05<00:10, 25.63it/s]
+Loading weights:  26%|██▌       | 88/339 [00:05<00:07, 33.53it/s]
+Loading weights:  29%|██▉       | 98/339 [00:05<00:05, 40.63it/s]
+Loading weights:  31%|███▏      | 106/339 [00:05<00:05, 45.30it/s]
+Loading weights:  34%|███▎      | 114/339 [00:06<00:04, 46.24it/s]
+Loading weights:  37%|███▋      | 124/339 [00:06<00:04, 51.64it/s]
+Loading weights:  40%|████      | 136/339 [00:06<00:03, 57.46it/s]
+Loading weights:  44%|████▎     | 148/339 [00:06<00:02, 66.49it/s]
+Loading weights:  47%|████▋     | 158/339 [00:06<00:02, 69.71it/s]
+Loading weights:  49%|████▉     | 166/339 [00:06<00:02, 70.29it/s]
+Loading weights:  51%|█████▏    | 174/339 [00:06<00:02, 63.66it/s]
+Loading weights:  54%|█████▍    | 184/339 [00:07<00:02, 68.48it/s]
+Loading weights:  57%|█████▋    | 194/339 [00:07<00:01, 72.80it/s]
+Loading weights:  60%|█████▉    | 202/339 [00:07<00:01, 71.00it/s]
+Loading weights:  62%|██████▏   | 210/339 [00:07<00:01, 64.55it/s]
+Loading weights:  64%|██████▍   | 218/339 [00:07<00:01, 67.03it/s]
+Loading weights:  68%|██████▊   | 230/339 [00:07<00:01, 76.30it/s]
+Loading weights:  70%|███████   | 238/339 [00:07<00:01, 73.89it/s]
+Loading weights:  73%|███████▎  | 246/339 [00:07<00:01, 67.19it/s]
+Loading weights:  75%|███████▍  | 254/339 [00:08<00:01, 68.05it/s]
+Loading weights:  78%|███████▊  | 266/339 [00:08<00:00, 76.47it/s]
+Loading weights:  81%|████████  | 274/339 [00:08<00:00, 74.17it/s]
+Loading weights:  83%|████████▎ | 282/339 [00:08<00:00, 66.96it/s]
+Loading weights:  86%|████████▌ | 292/339 [00:08<00:00, 71.79it/s]
+Loading weights:  90%|████████▉ | 304/339 [00:09<00:01, 29.62it/s]
+Loading weights:  93%|█████████▎| 316/339 [00:09<00:00, 28.15it/s]
+Loading weights:  95%|█████████▍| 321/339 [00:09<00:00, 30.35it/s]
+Loading weights: 100%|██████████| 339/339 [00:10<00:00, 33.73it/s]
+unsloth/qwen2.5-7b-instruct-unsloth-bnb-4bit does not have a padding token! Will use pad_token = <|PAD_TOKEN|>.
+
+[Baseline — before fine-tuning]
+Both `max_new_tokens` (=400) and `max_length`(=32768) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+==================== BEFORE TRAINING ====================
+شكراً على تقديم هذه المعلومات. دعنا نقوم بتحليلها خطوة بخطوة لصياغة خطة دراسية فعالة:
+
+1. **تقييم الوضع الحالي:**
+   - أولاً، من المهم أن نعرف مستوى القدرات الحالية لديك في المادة. هل تحتاج إلى التركيز على الجانب الكمي أم الجانب اللفظي؟
+
+2. **تحديد النقاط الرئيسية:**
+   - الهدف هو الوصول إلى درجة 90 في نهاية العام.
+   - لديك 60 يوماً و20 فصلاً للدراسة.
+   - ستدرس لمدة ساعتين يومياً.
+
+3. **تقسيم الوقت:**
+   - يمكن تقسيم 60 يوماً إلى حوالي 20 أسبوعاً، مما يعني أنك تحتاج إلى الانتهاء من كل فصل في أسبوع واحد تقريباً.
+   - بمعدل ساعتين يومياً، يمكنك الانتهاء من دراسة كل فصل في حوالي 5 أيام (20 ساعة لكل فصل).
+
+4. **التخطيط اليومي:**
+   - استخدم الوقت بشكل فعال. حدد وقتاً محدداً للدراسة كل يوم، مثل الساعة 7 صباحاً حتى 9 صباحاً، ثم استراحة قصيرة، ثم الاستمرار حتى الساعة 11 صباحاً.
+   - قم بتقييم فهمك بعد كل فصل وقم بالتمارين والاختبارات المنزلية.
+
+5. **مراجعة وتحسين:**
+   - بعد الانتهاء من كل فصل، قم بمراجعته وحل التمارين السابقة.
+   - استخدم وسائل التعلم المتاحة عبر الإنترنت أو التطبيقات التعليمية لتعزيز فهمك.
+
+6. **الدعم النفسي:**
+   - حافظ على التوازن بين الدراسة والراحة. احرص
+
+Adding QLoRA adapters...
+Unsloth 2026.5.8 patched 28 layers with 28 QKV layers, 28 O layers and 28 MLP layers.
+
+Loading dataset from data/datasets/tadarruj_chat_format.jsonl...
+
+Generating train split: 0 examples [00:00, ? examples/s]
+Generating train split: 201 examples [00:00, 6369.79 examples/s]
+
+Map:   0%|          | 0/180 [00:00<?, ? examples/s]
+Map: 100%|██████████| 180/180 [00:00<00:00, 703.68 examples/s]
+Map: 100%|██████████| 180/180 [00:00<00:00, 693.66 examples/s]
+
+Map:   0%|          | 0/21 [00:00<?, ? examples/s]
+Map: 100%|██████████| 21/21 [00:00<00:00, 595.73 examples/s]
+Train size: 180 | Eval size: 21
+
+Visible training target (first example):
+موهبة هي مؤسسة الملك عبدالعزيز ورجاله للموهبة والإبداع، مؤسسة حكومية سعودية متخصصة في دعم الطلاب الموهوبين.
+
+ما تقدمه:
+- البرامج الإثرائية: دورات وورش في العلوم والتقنية والرياضيات
+- البرامج الصيفية: معسكرات مكثفة للموهوبين
+- المسابقات: تنظيم أولمبياد العلوم والرياضيات
+- الابتعاث: تدعم بعض الطلاب لل
+
+Starting training...
+The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. The model config and generation config were aligned accordingly, being updated with the tokenizer's values. Updated tokens: {'bos_token_id': None}.
+==((====))==  Unsloth - 2x faster free finetuning | Num GPUs used = 1
+   \\   /|    Num examples = 180 | Num Epochs = 3 | Total steps = 69
+O^O/ \_/ \    Batch size per device = 2 | Gradient accumulation steps = 4
+\        /    Data Parallel GPUs = 1 | Total batch size (2 x 4 x 1) = 8
+ "-____-"     Trainable parameters = 40,370,176 of 7,655,986,688 (0.53% trained)
+
+  0%|          | 0/69 [00:00<?, ?it/s]`use_return_dict` is deprecated! Use `return_dict` instead!
+
+  1%|▏         | 1/69 [00:13<15:09, 13.37s/it]
+  3%|▎         | 2/69 [00:19<10:09,  9.09s/it]
+  4%|▍         | 3/69 [00:25<08:38,  7.86s/it]
+  6%|▌         | 4/69 [00:33<08:14,  7.60s/it]
+  7%|▋         | 5/69 [00:40<07:55,  7.43s/it]
+  9%|▊         | 6/69 [00:47<07:45,  7.39s/it]
+ 10%|█         | 7/69 [00:54<07:24,  7.18s/it]
+ 12%|█▏        | 8/69 [01:01<07:10,  7.06s/it]
+ 13%|█▎        | 9/69 [01:09<07:22,  7.38s/it]
+ 14%|█▍        | 10/69 [01:18<07:54,  8.05s/it]
+                                               
+{'loss': '2.038', 'grad_norm': '0.462', 'learning_rate': '0.00018', 'epoch': '0.4444'}
+
+ 14%|█▍        | 10/69 [01:18<07:54,  8.05s/it]
+ 16%|█▌        | 11/69 [01:27<07:56,  8.22s/it]
+ 17%|█▋        | 12/69 [01:34<07:37,  8.03s/it]
+ 19%|█▉        | 13/69 [01:42<07:27,  7.99s/it]
+ 20%|██        | 14/69 [01:49<06:56,  7.58s/it]
+ 22%|██▏       | 15/69 [01:57<06:53,  7.65s/it]
+ 23%|██▎       | 16/69 [02:04<06:40,  7.56s/it]
+ 25%|██▍       | 17/69 [02:12<06:34,  7.58s/it]
+ 26%|██▌       | 18/69 [02:19<06:23,  7.51s/it]
+ 28%|██▊       | 19/69 [02:28<06:33,  7.86s/it]
+ 29%|██▉       | 20/69 [02:36<06:29,  7.95s/it]
+                                               
+{'loss': '1.691', 'grad_norm': '0.5391', 'learning_rate': '0.0001887', 'epoch': '0.8889'}
+
+ 29%|██▉       | 20/69 [02:36<06:29,  7.95s/it]
+ 30%|███       | 21/69 [02:43<06:14,  7.81s/it]
+ 32%|███▏      | 22/69 [02:51<06:00,  7.67s/it]
+ 33%|███▎      | 23/69 [02:55<05:06,  6.67s/it]
+ 35%|███▍      | 24/69 [03:04<05:29,  7.32s/it]
+ 36%|███▌      | 25/69 [03:12<05:28,  7.46s/it]
+ 38%|███▊      | 26/69 [03:19<05:21,  7.48s/it]
+ 39%|███▉      | 27/69 [03:28<05:34,  7.96s/it]
+ 41%|████      | 28/69 [03:36<05:18,  7.78s/it]
+ 42%|████▏     | 29/69 [03:44<05:18,  7.96s/it]
+ 43%|████▎     | 30/69 [03:52<05:15,  8.09s/it]
+                                               
+{'loss': '1.389', 'grad_norm': '0.5824', 'learning_rate': '0.000153', 'epoch': '1.311'}
+
+ 43%|████▎     | 30/69 [03:52<05:15,  8.09s/it]
+ 45%|████▍     | 31/69 [04:00<04:58,  7.85s/it]
+ 46%|████▋     | 32/69 [04:08<04:52,  7.90s/it]
+ 48%|████▊     | 33/69 [04:16<04:45,  7.93s/it]
+ 49%|████▉     | 34/69 [04:24<04:37,  7.92s/it]
+ 51%|█████     | 35/69 [04:32<04:29,  7.92s/it]
+ 52%|█████▏    | 36/69 [04:39<04:18,  7.84s/it]
+ 54%|█████▎    | 37/69 [04:46<04:00,  7.52s/it]
+ 55%|█████▌    | 38/69 [04:53<03:53,  7.52s/it]
+ 57%|█████▋    | 39/69 [05:01<03:46,  7.55s/it]
+ 58%|█████▊    | 40/69 [05:09<03:38,  7.54s/it]
+                                               
+{'loss': '1.236', 'grad_norm': '0.8793', 'learning_rate': '0.0001027', 'epoch': '1.756'}
+
+ 58%|█████▊    | 40/69 [05:09<03:38,  7.54s/it]
+ 59%|█████▉    | 41/69 [05:16<03:26,  7.38s/it]
+ 61%|██████    | 42/69 [05:22<03:14,  7.19s/it]
+ 62%|██████▏   | 43/69 [05:29<03:02,  7.00s/it]
+ 64%|██████▍   | 44/69 [05:36<02:56,  7.08s/it]
+ 65%|██████▌   | 45/69 [05:44<02:53,  7.23s/it]
+ 67%|██████▋   | 46/69 [05:47<02:21,  6.16s/it]
+ 68%|██████▊   | 47/69 [05:55<02:28,  6.73s/it]
+ 70%|██████▉   | 48/69 [06:05<02:38,  7.53s/it]
+ 71%|███████   | 49/69 [06:13<02:31,  7.57s/it]
+ 72%|███████▏  | 50/69 [06:19<02:18,  7.31s/it]
+                                               
+{'loss': '1.216', 'grad_norm': '0.9654', 'learning_rate': '5.154e-05', 'epoch': '2.178'}
+
+ 72%|███████▏  | 50/69 [06:19<02:18,  7.31s/it]
+
+  0%|          | 0/11 [00:00<?, ?it/s][A
+
+ 18%|█▊        | 2/11 [00:00<00:03,  2.85it/s][A
+
+ 27%|██▋       | 3/11 [00:01<00:05,  1.37it/s][A
+
+ 36%|███▋      | 4/11 [00:02<00:05,  1.19it/s][A
+
+ 45%|████▌     | 5/11 [00:03<00:05,  1.13it/s][A
+
+ 55%|█████▍    | 6/11 [00:04<00:04,  1.17it/s][A
+
+ 64%|██████▎   | 7/11 [00:05<00:03,  1.19it/s][A
+
+ 73%|███████▎  | 8/11 [00:06<00:02,  1.13it/s][A
+
+ 82%|████████▏ | 9/11 [00:07<00:01,  1.06it/s][A
+
+ 91%|█████████ | 10/11 [00:08<00:00,  1.04it/s][A
+
+100%|██████████| 11/11 [00:09<00:00,  1.05it/s][A
+                                               
+
+                                               
+[A{'eval_loss': '1.47', 'eval_runtime': '10.99', 'eval_samples_per_second': '1.911', 'eval_steps_per_second': '1.001', 'epoch': '2.178'}
+
+ 72%|███████▏  | 50/69 [06:30<02:18,  7.31s/it]
+
+100%|██████████| 11/11 [00:09<00:00,  1.05it/s][A
+
+                                               [A
+ 74%|███████▍  | 51/69 [06:38<03:11, 10.66s/it]
+ 75%|███████▌  | 52/69 [06:47<02:51, 10.10s/it]
+ 77%|███████▋  | 53/69 [06:54<02:29,  9.32s/it]
+ 78%|███████▊  | 54/69 [07:01<02:10,  8.72s/it]
+ 80%|███████▉  | 55/69 [07:08<01:54,  8.15s/it]
+ 81%|████████  | 56/69 [07:16<01:42,  7.91s/it]
+ 83%|████████▎ | 57/69 [07:24<01:36,  8.06s/it]
+ 84%|████████▍ | 58/69 [07:32<01:29,  8.11s/it]
+ 86%|████████▌ | 59/69 [07:40<01:21,  8.14s/it]
+ 87%|████████▋ | 60/69 [07:47<01:09,  7.76s/it]
+                                               
+{'loss': '0.9899', 'grad_norm': '1.01', 'learning_rate': '1.384e-05', 'epoch': '2.622'}
+
+ 87%|████████▋ | 60/69 [07:47<01:09,  7.76s/it]
+ 88%|████████▊ | 61/69 [07:55<01:01,  7.64s/it]
+ 90%|████████▉ | 62/69 [08:03<00:55,  7.91s/it]
+ 91%|█████████▏| 63/69 [08:10<00:46,  7.71s/it]
+ 93%|█████████▎| 64/69 [08:19<00:40,  8.04s/it]
+ 94%|█████████▍| 65/69 [08:26<00:30,  7.61s/it]
+ 96%|█████████▌| 66/69 [08:32<00:21,  7.32s/it]
+ 97%|█████████▋| 67/69 [08:41<00:15,  7.64s/it]
+ 99%|█████████▊| 68/69 [08:48<00:07,  7.61s/it]
+100%|██████████| 69/69 [08:52<00:00,  6.57s/it]
+
+  0%|          | 0/11 [00:00<?, ?it/s][A
+
+ 18%|█▊        | 2/11 [00:01<00:04,  1.83it/s][A
+
+ 27%|██▋       | 3/11 [00:02<00:06,  1.17it/s][A
+
+ 36%|███▋      | 4/11 [00:03<00:06,  1.09it/s][A
+
+ 45%|████▌     | 5/11 [00:04<00:05,  1.06it/s][A
+
+ 55%|█████▍    | 6/11 [00:05<00:04,  1.12it/s][A
+
+ 64%|██████▎   | 7/11 [00:06<00:03,  1.15it/s][A
+
+ 73%|███████▎  | 8/11 [00:06<00:02,  1.10it/s][A
+
+ 82%|████████▏ | 9/11 [00:08<00:01,  1.05it/s][A
+
+ 91%|█████████ | 10/11 [00:09<00:00,  1.02it/s][A
+
+100%|██████████| 11/11 [00:10<00:00,  1.03it/s][A
+                                               
+
+                                               
+[A{'eval_loss': '1.476', 'eval_runtime': '10.81', 'eval_samples_per_second': '1.942', 'eval_steps_per_second': '1.017', 'epoch': '3'}
+
+100%|██████████| 69/69 [09:03<00:00,  6.57s/it]
+
+100%|██████████| 11/11 [00:10<00:00,  1.03it/s][A
+
+                                               [AUnsloth: Restored added_tokens_decoder metadata in outputs/tadarruj-checkpoints/checkpoint-69/tokenizer_config.json.
+
+                                               
+{'train_runtime': '545', 'train_samples_per_second': '0.991', 'train_steps_per_second': '0.127', 'train_loss': '1.368', 'epoch': '3'}
+
+100%|██████████| 69/69 [09:04<00:00,  6.57s/it]
+100%|██████████| 69/69 [09:05<00:00,  7.90s/it]
+
+Training complete. Loss: 1.3684
+
+Saving model to models/tadarruj_qwen2_5_7b_lora...
+Unsloth: Restored added_tokens_decoder metadata in models/tadarruj_qwen2_5_7b_lora/tokenizer_config.json.
+Saved.
+
+[Post-training check]
+Both `max_new_tokens` (=400) and `max_length`(=32768) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+==================== AFTER TRAINING ====================
+خطتك لـ 60 يوماً — قدرات إلى 90
+
+المرحلة 1 — التعلم (الأيام 1–20)
+هدف: فصل يومياً بساعة كمي + ساعة لفظي.
+• الأيام 1–10: الكمي (الجبر والهندسة والاحتمالات)
+• الأيام 11–20: اللفظي (فهم النصوص والفهم القرائي)
+
+المرحلة 2 — التطبيق (الأيام 21–40)
+هدف: 20 يوماً أسئلة مختلطة.
+• 30 سؤالاً يومياً في 75 دقيقة + 45 دقيقة تحليل
+• الأيام 35–40: أسئلة مركبة (جمع أسئلة سابقة)
+
+المرحلة 3 — المراجعة (الأيام 41–50)
+هدف: أضعف فصلين.
+• يومان لكل فصل، يوم مراجعة + يوم أسئلة
+
+المرحلة 4 — المحاكاة (الأيام 51–58)
+هدف: 8 اختبارات كاملة.
+• اختبار كل يومين + يوم تحليل
+
+أيام البافر (59–60)
+راحة + مراجعة نقاط الضعف.
+
+Done. Model saved to: models/tadarruj_qwen2_5_7b_lora
+
+Here are the observations based only on what's in the log:
+
+---
+**Baseline Observation**
+Before fine-tuning, `Qwen2.5-7B-Instruct` produced a polite and structured Arabic response, but it did not reflect Tadarruj's execution-focused behavior. The model responded with 6 generic numbered sections and ended mid-sentence:
+> "حافظ على التوازن بين الدراسة والراحة. احرص..."
+The baseline model did not produce a named 4-phase plan, did not assign specific day ranges, and did not use Tadarruj-specific output structure such as buffer days or phase labels.
+---
+**Training Summary**
+- **GPU:** Tesla T4 (14.5 GB)
+- **Trainable parameters:** 40,370,176 / 7,655,986,688 (0.53%)
+- **Dataset:** 201 examples → 180 train / 21 eval
+- **Epochs:** 3 | **Steps:** 69 | **Runtime:** 545 seconds (~9 min)
+
+Loss across training:
+| Step | Epoch | Train Loss |
+|------|-------|------------|
+| 10 | 0.44 | 2.038 |
+| 20 | 0.89 | 1.691 |
+| 30 | 1.31 | 1.389 |
+| 40 | 1.76 | 1.236 |
+| 50 | 2.18 | 1.216 |
+| 60 | 2.62 | 0.990 |
+**Final train loss: 1.3684 | Eval loss: 1.476**
+---
+**Post-Training Observation**
+After fine-tuning, the model immediately produced a structured 4-phase plan matching the Tadarruj schema:
+> خطتك لـ 60 يوماً — قدرات إلى 90
+>
+> المرحلة 1 — التعلم (الأيام 1–20)
+> المرحلة 2 — التطبيق (الأيام 21–40)
+> المرحلة 3 — المراجعة (الأيام 41–50)
+> المرحلة 4 — المحاكاة (الأيام 51–58)
+> أيام البافر (59–60)
+
+The model stopped asking clarifying questions and instead converted inputs directly into a day-by-day plan with named phases, specific day ranges, hourly breakdowns, and buffer days — none of which appeared in the baseline response.

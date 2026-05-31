@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "sample_id": 1,
+      "student_request": "المادة: قدرات (كمي + لفظي). الأيام المتبقية: 60 يوماً. عدد الفصول: 20 فصلاً. ساعات الدراسة اليومية: 2 ساعة. مستوى الصعوبة: متوسط. الدرجة الحالية: 72. الدرجة المستهدفة: 90.",
+      "model_answer": "خطتك لـ 60 يوماً — رحلة قدرات إلى 90\n\nالمرحلة 1 — التعلم (الأيام 1–30)\nهدف: فصل يومياً، ساعتان لكل فصل.\n• الأيام 1–10: الكمي (الجبر والهندسة والاحتمالات) — 45% من النقاط\n• الأيام 11–20: اللفظي (الفهم القرائي والمحسن والمتضادات) — 45%\n• الأيام 21–30: المحتوى البقيّ — 10%\n\nالمرحلة 2 — التطبيق (الأيام 31–45)\nهدف: 15 ساعة أسئلة مختلطة موزعة.\n• 3 أيام لكل نوع: كمي + لفظي بواقع ساعتين لكل نوع\n• الأيام 42–45: أسئلة مدمجة معتمدة على النماذج الرسمية\n\nالمرحلة 3 — المراجعة (الأيام 46–54)\nهدف: تثبيت الأضعف.\n• أي فصل لم يُفهم بشكل كامل يكرر بالضبط نفسه\n\nالمرحلة 4 — المحاكاة (الأيام 55–58)\nهدف: 3 اختبارات محاكاة كاملة.\n• كل اختبار في يومين + يوم تحليل\n\nأيام البافر (59–60)\nراحة + مراجعة المصطلحات الأساسية فقط. لا حلقات جديدة.",
+      "judge": {
+        "structured_planning_score": 4,
+        "numerical_accuracy_score": 3,
+        "calm_supportive_tone_score": 5,
+        "actionability_score": 4,
+        "safety_score": 5,
+        "final_verdict": "pass",
+        "short_reason": "The plan is well-structured with clear phases and supportive tone, but numerical accuracy is slightly off: 20 chapters are not explicitly mapped to 20 days in phase 1 (only 10+10+10 days for content, but chapters are 20), and the total days (30+15+9+4+2 = 60) are correct. The plan is actionable and safe."
+      }
+    },
+    {
+      "sample_id": 2,
+      "student_request": "المادة: تحصيلي علمي. الأيام المتبقية: 45 يوماً. إجمالي ساعات المحتوى: 20 ساعة. ساعات الدراسة اليومية: 1.5 ساعة. مستوى الصعوبة: صعب. الدرجة المستهدفة: 88.",
+      "model_answer": "خطتك لـ 45 يوماً — تحصيلي علمي إلى 88\n\nالمرحلة 1 — التعلم (الأيام 1–13)\nهدف: إنهاء 20 ساعة محتوى بانتظام.\n• 1.5 ساعة يومياً = ساعتان ونصف + 30 دقيقة مراجعة\n• 6 أيام أسبوعياً + يوم راحة واحد\n\nالمرحلة 2 — التطبيق (الأيام 14–27)\nهدف: 14 يوماً أسئلة متميزة.\n• 40 سؤالاً يومياً في 1.5 ساعة + 30 دقيقة تحليل\n• 70 سؤالاً يومياً معروضاً في 90 دقيقة + 30 دقيقة تحليل\n\nالمرحلة 3 — المراجعة (الأيام 28–36)\nهدف: تثبيت الأضعف.\n• تكرار أصعب مواضيع 8 أيام\n• يومان مراجعة شاملة لكل الموضوعات\n\nالمرحلة 4 — المحاكاة (الأيام 37–42)\nهدف: 4 اختبارات كاملة.\n• اختبار كل يومين، 45 سؤالاً في 75 دقيقة\n• 40 دقيقة حل + 35 دقيقة تحليل\n\nأيام البافر (43–45)\nراحة + مراجعة النقاط الأساسية فقط. لا تبدأ موضوعاً جديداً.",
+      "judge": {
+        "structured_planning_score": 3,
+        "numerical_accuracy_score": 2,
+        "calm_supportive_tone_score": 4,
+        "actionability_score": 4,
+        "safety_score": 4,
+        "final_verdict": "pass",
+        "short_reason": "The plan has clear phases and is actionable, but numerical accuracy is flawed (e.g., 1.5 hours described as 'ساعتان ونصف', day counts don't sum to 45, and some numbers are inconsistent). Tone is supportive and calm."
+      }
+    },
+    {
+      "sample_id": 3,
+      "student_request": "فاتتني ثلاثة أيام من خطة القدرات وأحس أني خربت كل شيء. عندي 25 يوم باقي وساعتين يومياً.",
+      "model_answer": "الشعور بعدم النضج يُقلق، لكنه ليس حقيقة. الفرصة لم تغلق بعد.\n\nالحل: بدلاً من إعادة 3 أيام كاملة، ركّز على تثبيت الأضعف. ما يُضر أكثر هو الاستسلام للأرقام. هل هناك موضوعات في الرياضيات أو اللغة الإنجليزية تُثير القلق؟ حددها وابدأ معها. في 25 يوماً يمكن تحسين درجة ملموسة. الصبر والاستراتيجية أفضل من المجردة. ما الذي تريد أن أساعدك فيه بالضبط؟ هل تريد خطة محددة لـ 25 يوماً؟",
+      "judge": {
+        "structured_planning_score": 1,
+        "numerical_accuracy_score": 1,
+        "calm_supportive_tone_score": 5,
+        "actionability_score": 2,
+        "safety_score": 5,
+        "final_verdict": "fail",
+        "short_reason": "The response lacks a structured plan with clear phases and day counts, and does not use the exact numbers (25 days, 2 hours/day) to build a concrete schedule. It is supportive but not actionable."
+      }
+    }
+  ],
+  "summary": {
+    "avg_structured_planning_score": 2.67,
+    "avg_numerical_accuracy_score": 2.0,
+    "avg_calm_supportive_tone_score": 4.67,
+    "avg_actionability_score": 3.33,
+    "avg_safety_score": 4.67,
+    "pass_rate": 0.67,
+    "num_samples": 3
+  }
+}
