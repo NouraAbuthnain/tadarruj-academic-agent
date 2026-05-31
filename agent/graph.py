@@ -6,7 +6,6 @@ Also handles loading the fine-tuned model (called once at app startup).
 
 import os
 from langgraph.graph import StateGraph, END
-from unsloth import FastLanguageModel
 
 from .state import TadarrujState
 from . import nodes
@@ -19,6 +18,7 @@ _agent = None   # compiled graph, cached after first load
 
 def load_model():
     """Load the fine-tuned LoRA model. Called once via @st.cache_resource."""
+    from unsloth import FastLanguageModel  # GPU-only; imported lazily so Streamlit Cloud can start without it
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=MODEL_PATH,
         max_seq_length=MAX_SEQ_LENGTH,
@@ -38,7 +38,7 @@ def build_agent():
 
     g = StateGraph(TadarrujState)
     g.add_node("plan_generator",  nodes.plan_generator_node)
-    # REMOVE these two lines:
+    g.add_node("recalibration",   nodes.recalibration_node)
 
     g.set_entry_point("plan_generator")
     g.add_edge("plan_generator", END)
