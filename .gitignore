@@ -1,0 +1,31 @@
+# ── Secrets ──────────────────────────────────────────────────────
+.env
+
+# ── Model weights ─────────────────────────────────────────────────
+models/
+
+# ── Generated files ───────────────────────────────────────────────
+data/datasets/tadarruj_chat_format.jsonl
+outputs/tadarruj-checkpoints/
+
+# ── Python ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# ── Jupyter ───────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── OS ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Lightning AI ──────────────────────────────────────────────────
+.lightning_studio/
+.lightning/
+.triton/
+.streamlit/
