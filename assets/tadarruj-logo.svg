@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220" role="img" aria-label="Tadarruj logo">
+  <title>Tadarruj</title>
+  <defs>
+    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5b8cf8"/>
+      <stop offset="100%" stop-color="#1e46c0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Bar 1 — shortest (leftmost) -->
+  <rect x="82"  y="102" width="26" height="38" rx="5" fill="url(#barGrad)"/>
+
+  <!-- Bar 2 — medium -->
+  <rect x="120" y="80"  width="26" height="60" rx="5" fill="url(#barGrad)"/>
+
+  <!-- T crossbar (top of tallest bar) -->
+  <rect x="145" y="45"  width="54" height="14" rx="5" fill="url(#barGrad)"/>
+
+  <!-- Bar 3 / T stem — tallest, drawn on top of crossbar for seamless join -->
+  <rect x="158" y="45"  width="26" height="95" rx="5" fill="url(#barGrad)"/>
+
+  <!-- Wordmark -->
+  <text
+    x="140"
+    y="184"
+    text-anchor="middle"
+    font-family="'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif"
+    font-size="22"
+    font-weight="600"
+    letter-spacing="3"
+    fill="#0f172a"
+  >Tadarruj</text>
+</svg>
