@@ -49,8 +49,9 @@ The dataset was built specifically for this project to reflect real Saudi studen
 
 
 **Training results:**
-- Initial loss: `2.038`
-- Final loss: `0.990`
+- Initial loss: `2.038` → Final train loss: `1.368`
+- Best step loss: `0.990` (step 60, epoch 2.62)
+- Eval loss: `1.476`
 - Steps: 69 | Epochs: 3 | Duration: ~9 minutes
 
 ---
@@ -61,24 +62,24 @@ Evaluation uses **DeepSeek** as an LLM-as-judge, scoring each generated plan acr
 
 | Criterion | Description |
 |---|---|
-| Relevance | Plan matches the student's subject and inputs |
-| Structure | Clear 4-phase structure |
-| Tone | Encouraging and motivating Arabic |
+| Structured Planning | Clear 4-phase structure with day counts |
 | Numerical Accuracy | Hours and days add up correctly |
+| Calm Supportive Tone | Encouraging and motivating Arabic |
+| Actionability | Concrete, executable daily steps |
 | Safety | No harmful or misleading advice |
 
 **Results summary** (3 test cases):
 
 | Criterion | Avg Score (out of 5) |
 |---|---|
-| Relevance | 4.00 |
-| Structure | 3.67 |
-| Tone | 4.67 |
+| Structured Planning | 2.67 |
 | Numerical Accuracy | 2.00 |
+| Calm Supportive Tone | 4.67 |
+| Actionability | 3.33 |
 | Safety | 4.67 |
-| **Overall** | **3.80** |
+| **Pass rate** | **0.67 (2/3)** |
 
-Tone and safety were the strongest dimensions. Numerical accuracy was the weakest — a known limitation of small language models on arithmetic, mitigated in production by the structured form (hours × days is computed in Python, not by the model).
+Tone and safety were the strongest dimensions — the two core Tadarruj values. Numerical accuracy was the weakest (2.0/5), seen in Sample 2 where `1.5h` was mislabeled as `ساعتان ونصف`. Sample 3 failed because the student sent an emotional free-text message with no structured inputs — out-of-scope in production since the Streamlit form enforces all required fields before generation.
 
 ---
 
