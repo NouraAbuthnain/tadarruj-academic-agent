@@ -11,18 +11,20 @@ Tadarruj is an AI-powered academic guidance system for Saudi high school student
 | Item | Details |
 |---|---|
 | **Phase** | Phase 1 — Study Planning Engine |
-| **Model** | Qwen2.5-7B-Instruct fine-tuned with QLoRA via Unsloth |
+| **LLM** | Google Gemma 4 31B via OpenRouter API |
+| **Fine-tuning experiment** | Qwen2.5-7B-Instruct with QLoRA via Unsloth (see Fine-Tuning section) |
 | **Agent** | LangGraph StateGraph + Pydantic v2 state management |
 | **Interface** | Streamlit (Arabic RTL, Cairo font) |
 | **Evaluation** | LLM-as-judge with DeepSeek API |
 | **Target users** | Saudi high school students preparing for Qudurat, Tahsili, SAT, STEP, IELTS |
 
+**Live demo:** [tadarruj-academic-agent.streamlit.app](https://tadarruj-academic-agent.streamlit.app)
 ---
 
 ## Features
 
 - **Structured form** — collects exam type, date, content volume, daily hours, difficulty, and target score
-- **AI plan generation** — fine-tuned SLM produces a 4-phase Arabic study plan (Learn → Practice → Apply → Simulate)
+- **AI plan generation** — LLM produces a 4-phase Arabic study plan (Learn → Practice → Apply → Simulate)
 - **Progress tracking** — log study hours daily; see total, completed, and remaining hours with a progress bar
 - **Chat recalibration** — ask the agent to adjust the plan if days were missed or circumstances changed
 - **Custom subject** — free-text input when the exam is not in the predefined list
@@ -40,13 +42,14 @@ The dataset was built specifically for this project to reflect real Saudi studen
 
 ---
 
-## Fine-Tuning
+## Fine-Tuning Experiment
+
+> **Note:** This is an ongoing experiment. The fine-tuned model is not used in the current deployment — the app uses the OpenRouter API instead.
 
 **Model:** `Qwen/Qwen2.5-7B-Instruct`  
 **Method:** QLoRA (4-bit quantization, r=16, alpha=16)  
 **Library:** [Unsloth](https://github.com/unslothai/unsloth) — requires a CUDA GPU  
 **Hardware:** Tesla T4 (Lightning AI)
-
 
 **Training results:**
 - Initial loss: `2.038` → Final train loss: `1.368`
@@ -89,7 +92,7 @@ Tone and safety were the strongest dimensions — the two core Tadarruj values. 
 User Input (StudyPlanRequest)
         │
         ▼
-  plan_generator_node          ← fine-tuned Qwen2.5 via Unsloth
+  plan_generator_node          ← Gemma 4 31B via OpenRouter API
         │
         ▼
   TadarrujState (plan + history)
@@ -115,18 +118,21 @@ git clone https://github.com/NouraAbuthnain/tadarruj-academic-agent.git
 cd tadarruj-academic-agent
 git checkout phase-1
 
-# 2. Install dependencies (CPU)
+# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Install Unsloth on a GPU machine
-pip install unsloth
-
-# 4. Add your API key
+# 3. Add your API keys
 cp .env.example .env
-# edit .env and add your DEEPSEEK_API_KEY
+# edit .env and add your OPENROUTER_API_KEY and DEEPSEEK_API_KEY
 
-# 5. Run the app
+# 4. Run the app
 streamlit run app/app.py --server.port 8080
+```
+
+**To run fine-tuning on a GPU machine:**
+```bash
+pip install unsloth
+python training/train.py
 ```
 
 > **Note:** The fine-tuned model weights are not included in the repo. Run `training/train.py` on a GPU machine to generate them, or load any Qwen2.5-7B-Instruct compatible adapter.
@@ -135,11 +141,12 @@ streamlit run app/app.py --server.port 8080
 
 ## Requirements
 
-See `requirements.txt` for the full list. 
+See `requirements.txt` for the full list.
 
 ---
 
 ## Roadmap
 
-- [x] **Phase 1** — Study planning engine with fine-tuned SLM + Streamlit app
+- [x] **Phase 1** — Study planning engine with API-powered LLM + Streamlit app
+- [ ] **Phase 1 (ongoing)** — Fine-tuning experiments (Qwen3-8B, more parameters, QLoRA vs PEFT)
 - [ ] **Phase 2** — Multi-agentic workflow (LangGraph) with RAG, multi-turn memory, Pydantic state, error handling, and agent tools
