@@ -1,4 +1,4 @@
-# Tadarruj Phase 1 — requirements.txt
+# Tadarruj Phase 1 + 2 — requirements.txt
 # Install: pip install -r requirements.txt
 # Then on GPU: pip install unsloth
 
@@ -16,6 +16,10 @@ langgraph==0.2.0
 langchain==0.2.16
 langchain-core==0.2.38
 pydantic==2.8.2
+
+# ── RAG ──────────────────────────────────────────────────────────
+chromadb==0.5.3
+sentence-transformers==3.0.1
 
 # ── App and Evaluation ───────────────────────────────────────────
 streamlit==1.37.0
