@@ -29,3 +29,13 @@ Thumbs.db
 .lightning/
 .triton/
 .streamlit/
+
+# ── IDE / Editor ──────────────────────────────────────────────────
+.cursor-server
+.idea/
+.vscode-server
+.vscode/
+.windsurf-server
+
+# ── Unsloth cache ─────────────────────────────────────────────────
+unsloth_compiled_cache/
