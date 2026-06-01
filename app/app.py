@@ -19,7 +19,7 @@ sys.path.insert(0, PROJECT_ROOT)
 import streamlit as st
 
 # ── Internal ──────────────────────────────────────────────────
-from agent import load_model, generate_plan, chat_reply
+from agent import generate_plan, chat_reply
 from agent.state import StudyPlanRequest, TadarrujState, ChatMessage
 
 # ── Page config ───────────────────────────────────────────────
@@ -255,12 +255,7 @@ st.markdown(f"""
 
 st.write("حوّل موعد اختبارك إلى خطة يومية واضحة وقابلة للتنفيذ، بخطوات منظمة بعيدًا عن الضغط والفوضى لتصل بثقة إلى هدفك.")
 
-# ── Load fine-tuned model (cached across reruns) ──────────────
-@st.cache_resource(show_spinner=":hourglass: جارٍ تحميل النموذج...")
-def get_model():
-    return load_model()
-
-get_model()
+# ── No model loading needed — using OpenRouter API ────────────
 
 # ── Session state: initialize defaults on first run ───────────
 for k, v in [("plan", None), ("request", None), ("chat_history", []), ("hours_done", 0.0)]:
