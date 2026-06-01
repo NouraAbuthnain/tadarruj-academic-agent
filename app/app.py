@@ -342,10 +342,13 @@ if generate_btn:
         st.session_state.hours_done   = 0.0
         st.success(":white_check_mark: تم إنشاء خطتك الدراسية بنجاح!")
     
+    # except Exception as e:
+    #     print(e)
+    #     st.error(":x: حدث خطأ أثناء إنشاء الخطة الدراسية. يرجى المحاولة مرة أخرى.")
     except Exception as e:
-        print(e)
-        st.error(":x: حدث خطأ أثناء إنشاء الخطة الدراسية. يرجى المحاولة مرة أخرى.")
-
+        import traceback
+        print(traceback.format_exc())
+        st.error(f":x: {str(e)}")
 # ══════════════════════════════════════════════════════════════
 # PLAN OUTPUT — shown after plan is generated
 # ══════════════════════════════════════════════════════════════
