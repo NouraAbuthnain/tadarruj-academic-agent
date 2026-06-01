@@ -38,7 +38,6 @@ def build_agent():
 
     g = StateGraph(TadarrujState)
     g.add_node("plan_generator",  nodes.plan_generator_node)
-    g.add_node("recalibration",   nodes.recalibration_node)
 
     g.set_entry_point("plan_generator")
     g.add_edge("plan_generator", END)
