@@ -1,15 +1,17 @@
 """
-app/app.py — Tadarruj Phase 1 Streamlit App
+app/app.py — Tadarruj Phase 2 Streamlit App
 
 Study Planning Engine with:
-- Structured study-plan form
-- AI-powered plan generation
-- Chat-based recalibration
+- Mode selection (study plan / 3-year roadmap)
+- Structured study-plan form with AI-powered plan generation (RAG-enhanced)
+- 3-year academic roadmap generator (RAG-enhanced)
+- Chat-based recalibration with multi-turn memory
+- Error handling with user-friendly Arabic messages
 """
 
 # ── Standard library ──────────────────────────────────────────
 import os, sys, datetime, base64
-from typing import cast
+from typing import cast, Literal
 
 # ── Fix import path so `agent` package is found ───────────────
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -19,8 +21,8 @@ sys.path.insert(0, PROJECT_ROOT)
 import streamlit as st
 
 # ── Internal ──────────────────────────────────────────────────
-from agent import generate_plan, chat_reply
-from agent.state import StudyPlanRequest, TadarrujState, ChatMessage
+from agent import generate_plan, generate_roadmap, chat_reply
+from agent.state import StudyPlanRequest, RoadmapRequest, TadarrujState, ChatMessage
 
 # ── Page config ───────────────────────────────────────────────
 st.set_page_config(
@@ -180,6 +182,18 @@ st.markdown("""
             text-align: right;
         }
 
+        /* ── 3-year academic roadmap display ── */
+        .roadmap-box {
+            border-right: 4px solid #7c3aed;
+            border-radius: 12px;
+            padding: 1.5rem 1.8rem;
+            font-size: 1rem;
+            line-height: 2;
+            white-space: pre-wrap;
+            direction: rtl;
+            text-align: right;
+        }
+
         /* ── User chat bubble (right-aligned, no avatar) ── */
         .bubble-user {
             background: var(--primary);
@@ -258,202 +272,316 @@ st.write("حوّل موعد اختبارك إلى خطة يومية واضحة �
 # ── No model loading needed — using OpenRouter API ────────────
 
 # ── Session state: initialize defaults on first run ───────────
-for k, v in [("plan", None), ("request", None), ("chat_history", []), ("hours_done", 0.0)]:
+for k, v in [
+    ("mode", None),
+    ("plan", None),
+    ("request", None),
+    ("roadmap_output", None),
+    ("roadmap_request", None),
+    ("chat_history", []),
+    ("hours_done", 0.0),
+]:
     if k not in st.session_state:
         st.session_state[k] = v
 
 # ══════════════════════════════════════════════════════════════
-# FORM — collect exam info and generate plan
+# MODE SELECTION — shown on first load
 # ══════════════════════════════════════════════════════════════
-with st.expander(":memo: معلومات الاختبار", expanded=(st.session_state.plan is None)):
+if st.session_state.mode is None:
+    st.caption(":compass: ماذا تريد اليوم؟")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("📚 خطة دراسية لاختبار قادم", use_container_width=True, type="primary"):
+            st.session_state.mode = "study_plan"
+            st.rerun()
+    with col2:
+        if st.button("🗺️ خارطة طريق أكاديمية (3 سنوات)", use_container_width=True):
+            st.session_state.mode = "roadmap"
+            st.rerun()
+    st.stop()
 
-    subject = st.selectbox("اختر المادة أو نوع الاختبار", [
-        "قدرات (كمي + لفظي)", "قدرات كمي فقط", "قدرات لفظي فقط",
-        "تحصيلي علمي", "تحصيلي أدبي",
-        "SAT", "STEP", "IELTS",
-        "رياضيات", "فيزياء", "كيمياء", "أحياء", "أخرى",
-    ])
+# ── Back button: reset state and return to mode selection ─────
+if st.button("← العودة للرئيسية"):
+    for k in ["mode", "plan", "request", "roadmap_output", "roadmap_request", "chat_history", "hours_done"]:
+        st.session_state[k] = None if k not in ("chat_history", "hours_done") else ([] if k == "chat_history" else 0.0)
+    st.rerun()
 
-    # Allow free-text entry when subject is not in the list
-    if subject == "أخرى":
-        custom_subject = st.text_input("اكتب اسم المادة أو الاختبار")
-        if custom_subject.strip():
-            subject = custom_subject.strip()
+# ══════════════════════════════════════════════════════════════
+# PATH A — STUDY PLAN
+# ══════════════════════════════════════════════════════════════
+if st.session_state.mode == "study_plan":
 
-    # cast() resolves the type ambiguity from st.date_input
-    exam_date = cast(
-        datetime.date,
-        st.date_input(
-            "حدد تاريخ الاختبار",
-            value=datetime.date.today() + datetime.timedelta(days=45),
-            min_value=datetime.date.today() + datetime.timedelta(days=1),
+    with st.expander(":memo: معلومات الاختبار", expanded=(st.session_state.plan is None)):
+
+        subject = st.selectbox("اختر المادة أو نوع الاختبار", [
+            "قدرات (كمي + لفظي)", "قدرات كمي فقط", "قدرات لفظي فقط",
+            "تحصيلي علمي", "تحصيلي أدبي",
+            "SAT", "STEP", "IELTS",
+            "رياضيات", "فيزياء", "كيمياء", "أحياء", "أخرى",
+        ])
+
+        # Allow free-text entry when subject is not in the list
+        if subject == "أخرى":
+            custom_subject = st.text_input("اكتب اسم المادة أو الاختبار")
+            if custom_subject.strip():
+                subject = custom_subject.strip()
+
+        # cast() resolves the type ambiguity from st.date_input
+        exam_date = cast(
+            datetime.date,
+            st.date_input(
+                "حدد تاريخ الاختبار",
+                value=datetime.date.today() + datetime.timedelta(days=45),
+                min_value=datetime.date.today() + datetime.timedelta(days=1),
+            )
         )
-    )
-    days_left = (exam_date - datetime.date.today()).days
-    st.caption(f":calendar: تبقّى على اختبارك **{days_left}** يومًا")
+        days_left = (exam_date - datetime.date.today()).days
+        st.caption(f":calendar: تبقّى على اختبارك **{days_left}** يومًا")
 
-    content_type = st.radio(
-        "كيف تود تحديد حجم المحتوى؟",
-        ["حسب عدد الفصول", "حسب إجمالي ساعات المحتوى"],
-    )
-
-    chapters, total_hours = None, None
-    if content_type == "حسب عدد الفصول":
-        chapters = st.number_input("كم عدد الفصول المطلوب مذاكرتها؟", min_value=1, max_value=100, value=20, step=1)
-    else:
-        total_hours = st.number_input("كم ساعة يحتاج المحتوى كاملًا؟", min_value=1.0, max_value=200.0, value=20.0, step=0.5)
-
-    hours_per_day = st.slider("كم ساعة يمكنك الدراسة يوميًا؟", min_value=0.5, max_value=10.0, value=2.0, step=0.5)
-
-    difficulty = st.selectbox("ما مستوى صعوبة المحتوى بالنسبة لك؟", ["سهل", "متوسط", "صعب"])
-
-    target_score = st.number_input("ما درجتك المستهدفة؟", min_value=1, max_value=1600, value=85, step=1)
-
-    took_before = st.checkbox("سبق لك أداء هذا الاختبار؟")
-    current_score = None
-    if took_before:
-        current_score = st.number_input("ما درجتك السابقة؟", min_value=1, max_value=1600, value=70, step=1)
-
-    # Block generation if too few days remain
-    if days_left < 7:
-        st.warning(":warning: الوقت المتبقي قصير جدًا، نوصي بحد أدنى 7 أيام لبناء خطة فعّالة.")
-        generate_btn = False
-    else:
-        generate_btn = st.button(":rocket: أنشئ خطتي الدراسية", type="primary", use_container_width=True)
-
-# ── Generate plan on button click ────────────────────────────
-if generate_btn:
-    try:
-        req = StudyPlanRequest(
-            subject=subject or "",
-            days_left=int(days_left),
-            chapters=int(chapters) if chapters else None,
-            total_hours=float(total_hours) if total_hours else None,
-            hours_per_day=float(hours_per_day),
-            difficulty=difficulty or "متوسط",
-            current_score=int(current_score) if current_score else None,
-            target_score=int(target_score),
+        content_type = st.radio(
+            "كيف تود تحديد حجم المحتوى؟",
+            ["حسب عدد الفصول", "حسب إجمالي ساعات المحتوى"],
         )
-        with st.spinner(":hourglass: جارٍ إعداد خطتك الدراسية..."):
-            plan = generate_plan(req)
-        st.session_state.plan         = plan
-        st.session_state.request      = req
-        st.session_state.chat_history = []
-        st.session_state.hours_done   = 0.0
-        st.success(":white_check_mark: تم إنشاء خطتك الدراسية بنجاح!")
-    
-    # except Exception as e:
-    #     print(e)
-    #     st.error(":x: حدث خطأ أثناء إنشاء الخطة الدراسية. يرجى المحاولة مرة أخرى.")
-    except Exception as e:
-        import traceback
-        print(traceback.format_exc())
-        st.error(f":x: {str(e)}")
-# ══════════════════════════════════════════════════════════════
-# PLAN OUTPUT — shown after plan is generated
-# ══════════════════════════════════════════════════════════════
-if st.session_state.plan:
-    req = st.session_state.request
-    st.divider()
 
-    # ── Compute progress values ───────────────────────────────
-    total_hours_planned = req.hours_per_day * req.days_left
-    hours_remaining     = max(0.0, total_hours_planned - st.session_state.hours_done)
-    pct = (st.session_state.hours_done / total_hours_planned * 100) if total_hours_planned > 0 else 0
-
-    # ── Progress metrics ──────────────────────────────────────
-    st.caption(":bar_chart: ملخص التقدّم")
-    s1, s2, s3 = st.columns(3)
-    for col, val, label in [
-        (s1, f"{total_hours_planned:.0f}", "إجمالي ساعات الخطة"),
-        (s2, f"{st.session_state.hours_done:.1f}", "الساعات المنجزة"),
-        (s3, f"{hours_remaining:.1f}", "الساعات المتبقية"),
-    ]:
-        with col:
-            st.metric(label=label, value=val)
-
-    # ── Progress bar with percentage label ───────────────────
-    st.markdown(
-        f"<div style='display:flex; justify-content:space-between; margin-bottom:4px;'>"
-        f"<span style='color:var(--muted); font-size:0.85rem;'>نسبة الإنجاز</span>"
-        f"<span style='color:var(--primary); font-weight:700;'>{pct:.0f}%</span>"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-    st.progress(min(pct / 100, 1.0))
-
-    # ── Log study hours ───────────────────────────────────────
-    st.divider()
-    logged = st.number_input(
-        "كم ساعة درست اليوم؟",
-        min_value=0.0, max_value=24.0, step=0.5, value=0.0, key="log_input",
-    )
-    if st.button(":white_check_mark: إضافة الساعات", use_container_width=True):
-        st.session_state.hours_done += logged
-        st.rerun()
-
-    # ── Today's focus: extract day-1 lines from the plan ─────
-    st.divider()
-    st.caption(":dart: تركيز اليوم")
-    focus_lines = [
-        line.strip() for line in st.session_state.plan.split("\n")
-        if any(k in line for k in ["يوم 1", "اليوم الأول", "المرحلة 1", "التعلم"])
-    ]
-    if focus_lines:
-        for fl in focus_lines[:3]:
-            st.info(fl)
-    else:
-        st.info(f"ابدأ بـ {req.hours_per_day} ساعة دراسة اليوم وفق خطتك أدناه.")
-
-    # ── Full generated plan ───────────────────────────────────
-    st.divider()
-    st.caption(":open_book: خطتك الدراسية")
-    st.markdown(f'<div class="plan-box">{st.session_state.plan}</div>', unsafe_allow_html=True)
-
-    # ── Recommendation based on completion percentage ─────────
-    st.divider()
-    st.caption(":bulb: التوصية الحالية")
-    if pct < 10:
-        rec = "ابدأ بالمرحلة الأولى وركّز على بناء عادة يومية ثابتة."
-    elif pct < 50:
-        rec = "تقدّمك جيد. استمر على نفس الوتيرة وحافظ على انتظامك اليومي."
-    elif pct < 80:
-        rec = "أنت في مرحلة متقدمة. ابدأ بزيادة التطبيق وحل الأسئلة."
-    else:
-        rec = "اقترب موعد الاختبار. ركّز على المحاكاة والمراجعة الخفيفة والراحة الكافية."
-    st.info(rec)
-
-    # ══════════════════════════════════════════════════════════
-    # CHAT — recalibration and Q&A
-    # ══════════════════════════════════════════════════════════
-    st.divider()
-    st.caption(":thought_balloon: اسأل أو عدّل خطتك")
-    st.write("يمكنك طلب تعديل الخطة إذا فاتتك أيام، أو تغيّرت ظروفك، أو أردت إضافة مادة جديدة.")
-
-    # ── Render chat history ───────────────────────────────────
-    for msg in st.session_state.chat_history:
-        if msg.role == "user":
-            st.markdown(f'<div class="bubble-user">{msg.content}</div>', unsafe_allow_html=True)
+        chapters, total_hours = None, None
+        if content_type == "حسب عدد الفصول":
+            chapters = st.number_input("كم عدد الفصول المطلوب مذاكرتها؟", min_value=1, max_value=100, value=20, step=1)
         else:
-            st.markdown(f"""
-            <div class="chat-bot-row">
-                <div class="bot-avatar">🤖</div>
-                <div class="bubble-bot">{msg.content}</div>
-            </div>""", unsafe_allow_html=True)
+            total_hours = st.number_input("كم ساعة يحتاج المحتوى كاملًا؟", min_value=1.0, max_value=200.0, value=20.0, step=0.5)
 
-    # ── Handle new user message ───────────────────────────────
-    user_chat = st.chat_input("اكتب سؤالك أو التعديل المطلوب")
-    if user_chat:
-        new_history = st.session_state.chat_history + [ChatMessage(role="user", content=user_chat)]
-        agent_state = TadarrujState(
-            request=st.session_state.request,
-            plan=st.session_state.plan,
-            chat_history=new_history,
+        hours_per_day = st.slider("كم ساعة يمكنك الدراسة يوميًا؟", min_value=0.5, max_value=10.0, value=2.0, step=0.5)
+        difficulty    = st.selectbox("ما مستوى صعوبة المحتوى بالنسبة لك؟", ["سهل", "متوسط", "صعب"])
+        target_score  = st.number_input("ما درجتك المستهدفة؟", min_value=1, max_value=1600, value=85, step=1)
+
+        took_before   = st.checkbox("سبق لك أداء هذا الاختبار؟")
+        current_score = None
+        if took_before:
+            current_score = st.number_input("ما درجتك السابقة؟", min_value=1, max_value=1600, value=70, step=1)
+
+        # Block generation if too few days remain
+        if days_left < 7:
+            st.warning(":warning: الوقت المتبقي قصير جدًا، نوصي بحد أدنى 7 أيام لبناء خطة فعّالة.")
+            generate_btn = False
+        else:
+            generate_btn = st.button(":rocket: أنشئ خطتي الدراسية", type="primary", use_container_width=True)
+
+    # ── Generate plan on button click ─────────────────────────
+    if generate_btn:
+        try:
+            req = StudyPlanRequest(
+                subject=subject or "",
+                days_left=int(days_left),
+                chapters=int(chapters) if chapters else None,
+                total_hours=float(total_hours) if total_hours else None,
+                hours_per_day=float(hours_per_day),
+                difficulty=difficulty or "متوسط",
+                current_score=int(current_score) if current_score else None,
+                target_score=int(target_score),
+            )
+            with st.spinner(":hourglass: جارٍ إعداد خطتك الدراسية..."):
+                plan = generate_plan(req)
+            st.session_state.plan         = plan
+            st.session_state.request      = req
+            st.session_state.chat_history = []
+            st.session_state.hours_done   = 0.0
+            st.success(":white_check_mark: تم إنشاء خطتك الدراسية بنجاح!")
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            st.error(f":x: {str(e)}")
+
+    # ── Plan output: shown after plan is generated ────────────
+    if st.session_state.plan:
+        req = st.session_state.request
+        st.divider()
+
+        # ── Compute progress values ───────────────────────────
+        total_hours_planned = req.hours_per_day * req.days_left
+        hours_remaining     = max(0.0, total_hours_planned - st.session_state.hours_done)
+        pct = (st.session_state.hours_done / total_hours_planned * 100) if total_hours_planned > 0 else 0
+
+        # ── Progress metrics ──────────────────────────────────
+        st.caption(":bar_chart: ملخص التقدّم")
+        s1, s2, s3 = st.columns(3)
+        for col, val, label in [
+            (s1, f"{total_hours_planned:.0f}", "إجمالي ساعات الخطة"),
+            (s2, f"{st.session_state.hours_done:.1f}", "الساعات المنجزة"),
+            (s3, f"{hours_remaining:.1f}", "الساعات المتبقية"),
+        ]:
+            with col:
+                st.metric(label=label, value=val)
+
+        # ── Progress bar with percentage label ───────────────
+        st.markdown(
+            f"<div style='display:flex; justify-content:space-between; margin-bottom:4px;'>"
+            f"<span style='color:var(--muted); font-size:0.85rem;'>نسبة الإنجاز</span>"
+            f"<span style='color:var(--primary); font-weight:700;'>{pct:.0f}%</span>"
+            f"</div>",
+            unsafe_allow_html=True,
         )
-        with st.spinner(":hourglass: جارٍ تحديث خطتك..."):
-            updated_state = chat_reply(agent_state)
-        st.session_state.chat_history = updated_state.chat_history
-        # Update plan in session if agent returned a revised version
-        if updated_state.plan != st.session_state.plan:
-            st.session_state.plan = updated_state.plan
-        st.rerun()
+        st.progress(min(pct / 100, 1.0))
+
+        # ── Log study hours ───────────────────────────────────
+        st.divider()
+        logged = st.number_input(
+            "كم ساعة درست اليوم؟",
+            min_value=0.0, max_value=24.0, step=0.5, value=0.0, key="log_input",
+        )
+        if st.button(":white_check_mark: إضافة الساعات", use_container_width=True):
+            st.session_state.hours_done += logged
+            st.rerun()
+
+        # ── Today's focus: extract day-1 lines from the plan ─
+        st.divider()
+        st.caption(":dart: تركيز اليوم")
+        focus_lines = [
+            line.strip() for line in st.session_state.plan.split("\n")
+            if any(k in line for k in ["يوم 1", "اليوم الأول", "المرحلة 1", "التعلم"])
+        ]
+        if focus_lines:
+            for fl in focus_lines[:3]:
+                st.info(fl)
+        else:
+            st.info(f"ابدأ بـ {req.hours_per_day} ساعة دراسة اليوم وفق خطتك أدناه.")
+
+        # ── Full generated plan ───────────────────────────────
+        st.divider()
+        st.caption(":open_book: خطتك الدراسية")
+        st.markdown(f'<div class="plan-box">{st.session_state.plan}</div>', unsafe_allow_html=True)
+
+        # ── Recommendation based on completion percentage ─────
+        st.divider()
+        st.caption(":bulb: التوصية الحالية")
+        if pct < 10:
+            rec = "ابدأ بالمرحلة الأولى وركّز على بناء عادة يومية ثابتة."
+        elif pct < 50:
+            rec = "تقدّمك جيد. استمر على نفس الوتيرة وحافظ على انتظامك اليومي."
+        elif pct < 80:
+            rec = "أنت في مرحلة متقدمة. ابدأ بزيادة التطبيق وحل الأسئلة."
+        else:
+            rec = "اقترب موعد الاختبار. ركّز على المحاكاة والمراجعة الخفيفة والراحة الكافية."
+        st.info(rec)
+
+        # ══════════════════════════════════════════════════════
+        # CHAT — recalibration and Q&A with multi-turn memory
+        # ══════════════════════════════════════════════════════
+        st.divider()
+        st.caption(":thought_balloon: اسأل أو عدّل خطتك")
+        st.write("يمكنك طلب تعديل الخطة إذا فاتتك أيام، أو تغيّرت ظروفك، أو أردت إضافة مادة جديدة.")
+
+        # ── Render chat history ───────────────────────────────
+        for msg in st.session_state.chat_history:
+            if msg.role == "user":
+                st.markdown(f'<div class="bubble-user">{msg.content}</div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="chat-bot-row">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="bubble-bot">{msg.content}</div>
+                </div>""", unsafe_allow_html=True)
+
+        # ── Handle new user message ───────────────────────────
+        user_chat = st.chat_input("اكتب سؤالك أو التعديل المطلوب")
+        if user_chat:
+            new_history = st.session_state.chat_history + [ChatMessage(role="user", content=user_chat)]
+            agent_state = TadarrujState(
+                request=st.session_state.request,
+                plan=st.session_state.plan,
+                chat_history=new_history,
+            )
+            with st.spinner(":hourglass: جارٍ تحديث خطتك..."):
+                updated_state = chat_reply(agent_state)
+            st.session_state.chat_history = updated_state.chat_history
+            # Update plan in session if agent returned a revised version
+            if updated_state.plan != st.session_state.plan:
+                st.session_state.plan = updated_state.plan
+            st.rerun()
+
+
+# ══════════════════════════════════════════════════════════════
+# PATH B — 3-YEAR ACADEMIC ROADMAP
+# ══════════════════════════════════════════════════════════════
+elif st.session_state.mode == "roadmap":
+
+    with st.expander(":compass: معلوماتك الأكاديمية", expanded=(st.session_state.roadmap_output is None)):
+
+        # Grade selector
+        current_grade = st.selectbox(
+            "في أي صف أنت الآن؟",
+            ["10", "11", "12"],
+            format_func=lambda x: f"الصف {x} (ثانوي {'أول' if x=='10' else 'ثاني' if x=='11' else 'ثالث'})",
+        )
+
+        major_interest = st.selectbox("ما المجال الذي تطمح إليه؟", [
+            "طب وعلوم صحية", "هندسة وعلوم حاسب", "ذكاء اصطناعي وأمن سيبراني",
+            "إدارة أعمال ومحاسبة", "حقوق وعلوم إنسانية", "تربية وتعليم", "أخرى",
+        ])
+
+        # Allow free-text entry for major
+        if major_interest == "أخرى":
+            custom_major = st.text_input("اكتب المجال الذي تطمح إليه")
+            if custom_major.strip():
+                major_interest = custom_major.strip()
+
+        target_university = st.text_input(
+            "جامعتك المستهدفة (اختياري)",
+            placeholder="مثال: جامعة الملك سعود",
+        )
+
+        roadmap_btn = st.button(":map: أنشئ خارطة طريقي الأكاديمية", type="primary", use_container_width=True)
+
+    # ── Generate roadmap on button click ──────────────────────
+    if roadmap_btn:
+        try:
+            req = RoadmapRequest(
+                grade=current_grade,                                               # ← fixed: was current_grade=
+                major_interest=major_interest or "",
+                target_university=target_university.strip() if target_university.strip() else None,
+            )
+            with st.spinner(":hourglass: جارٍ إنشاء خارطة طريقك الأكاديمية..."):
+                roadmap = generate_roadmap(req)
+            st.session_state.roadmap_output  = roadmap
+            st.session_state.roadmap_request = req
+            st.session_state.chat_history    = []
+            st.success(":white_check_mark: تم إنشاء خارطة طريقك الأكاديمية بنجاح!")
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            st.error(f":x: {str(e)}")
+
+    # ── Roadmap output ────────────────────────────────────────
+    if st.session_state.roadmap_output:
+        st.divider()
+        st.caption(":map: خارطة طريقك الأكاديمية")
+        st.markdown(f'<div class="roadmap-box">{st.session_state.roadmap_output}</div>', unsafe_allow_html=True)
+
+        # ══════════════════════════════════════════════════════
+        # CHAT — Q&A about the roadmap with multi-turn memory
+        # ══════════════════════════════════════════════════════
+        st.divider()
+        st.caption(":thought_balloon: اسأل عن خارطة طريقك")
+        st.write("يمكنك سؤال تدرّج عن أي جزء من خطتك الأكاديمية.")
+
+        # ── Render chat history ───────────────────────────────
+        for msg in st.session_state.chat_history:
+            if msg.role == "user":
+                st.markdown(f'<div class="bubble-user">{msg.content}</div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="chat-bot-row">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="bubble-bot">{msg.content}</div>
+                </div>""", unsafe_allow_html=True)
+
+        # ── Handle new user message ───────────────────────────
+        user_chat = st.chat_input("اكتب سؤالك عن خارطة طريقك")
+        if user_chat:
+            new_history = st.session_state.chat_history + [ChatMessage(role="user", content=user_chat)]
+            agent_state = TadarrujState(
+                roadmap=st.session_state.roadmap_output,
+                chat_history=new_history,
+            )
+            with st.spinner(":hourglass: جارٍ البحث عن إجابتك..."):
+                updated_state = chat_reply(agent_state)
+            st.session_state.chat_history = updated_state.chat_history
+            st.rerun()
